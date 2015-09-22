@@ -1,83 +1,79 @@
 var express = require('express');
 var app = express();
+var util = require("util");
 var server = require('http').createServer(app);
 var io = require('socket.io')(server);
+var Player = require("./model/Player").Player;
 
 // Routing
 app.use(express.static(__dirname + '/public'));
 
 
-//All users
-var Users = new Array(255);
+var players = [];
 
-//App instance @param valid socket
-var App = function (socket) {
+io.on("connection", onSocketConnection);
 
-    //Create instance for refrence in other functions
-    var instance = this;
+function onSocketConnection(client) {
+    util.log("New player has connected: "+client.id);
 
-    //Create new user instance for the current socket
-    this.Player = {
-        x: 250,
-        y: 250,
-        id: 0,
-        name: ""
-    };
+    client.on("disconnect", onClientDisconnect);
+    client.on("new player", onNewPlayer);
+    client.on("move player", onMovePlayer);
+}
 
-    //function for initial
-    this.sendInital = function (socket) {
-        for(var q = 0; q < Users.length; q++) {
-            if(Users[q] === undefined) {
-                instance.Player.id = q;
-                Users[q] = instance.Player;
-                console.log('user added');
-                io.emit("addPlayer", Users[q]);
-                break;
-            }
-        }
+function onClientDisconnect() {
+    util.log("Player has disconnected: "+this.id);
 
-        for(var i = 0; i<Users.length; i++) {
-            if(Users[i] != undefined && i != instance.Player.id) {
-                socket.emit("addPlayer", Users[i]);
-            }
-        }
+    var removePlayer = playerById(this.id);
 
-    };
+    if (!removePlayer) {
+   //     util.log("Player not found: "+this.id);
+        return;
+    }
 
-    //send inital data to the socket
-    socket.on("register", function(name){
-        console.log("New player found!");
-        instance.Player.name = name;
-        instance.sendInital(socket);
-    });
+    players.splice(players.indexOf(removePlayer), 1);
 
-    //Update Player movement
-    socket.on("PlayerMove" , function(data) {
-
-        Users[instance.Player.id].x = data[0];
-        Users[instance.Player.id].y = data[1];
-
-        io.emit('UpdateUser', {
-            x:  data[0],
-            y:  data[1],
-            id: instance.Player.id
-        });
-
-    });
+    this.broadcast.emit("remove player", {id: this.id});
+}
 
 
-    socket.on("disconnect", function(socket) {
-        Users.splice(instance.Player.id, 1);
+function onNewPlayer(data) {
+    var newPlayer = new Player(data.x, data.y);
+    newPlayer.id = this.id;
 
-        io.emit('removePlayer', {
-            id: instance.Player.id
-        });
-    });
-};
+    this.broadcast.emit("new player", {id: newPlayer.id, x: newPlayer.getX(), y: newPlayer.getY()});
 
-//listens for new connection on connection create a new instance
-io.on("connection", function (socket) {
-    new App(socket);
-});
+    var i, existingPlayer;
+    for (i = 0; i < players.length; i++) {
+        existingPlayer = players[i];
+        this.emit("new player", {id: existingPlayer.id, x: existingPlayer.getX(), y: existingPlayer.getY()});
+    }
+
+    players.push(newPlayer);
+}
+
+function onMovePlayer(data) {
+    var movePlayer = playerById(this.id);
+
+    if (!movePlayer) {
+    //    util.log("Player not found: "+this.id);
+        return;
+    }
+
+    movePlayer.setX(data.x);
+    movePlayer.setY(data.y);
+    this.broadcast.emit("move player", {id: movePlayer.id, x: movePlayer.getX(), y: movePlayer.getY()});
+}
+
+
+function playerById(id) {
+    var i;
+    for (i = 0; i < players.length; i++) {
+        if (players[i].id == id)
+            return players[i];
+    }
+
+    return false;
+}
 
 server.listen(1337);
