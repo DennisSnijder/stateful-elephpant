@@ -6,6 +6,7 @@ window.onload = function() {
     var bigStyle = { font: "65px Arial", fill: "#ffffff", align: "center" };
     var normalStyle = { font: "16px monospace", fill: "#ffffff", align: "center" };
     var socket = io();
+    var currentPlayers = [];
 
     function preload() {
         game.load.image('sky', 'assets/sky.png');
@@ -36,11 +37,20 @@ window.onload = function() {
 
         player = createPlayer();
 
+        socket.on("addPlayer", function(data) {
+            currentPlayers.push({
+                gamePlayer: createPlayer(),
+                info: data
+            });
+
+            console.log(currentPlayers);
+        });
 
         state = game.add.text(0, 0, 'idling', bigStyle);
 
         cursors = game.input.keyboard.createCursorKeys();
         game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
+        socket.emit('register', 'player');
     }
 
 
@@ -65,23 +75,27 @@ window.onload = function() {
         game.physics.arcade.collide(player, platforms);
 
         player.body.velocity.x = 0;
+        updatePlayerMovement();
+
+
+        socket.on('newPlayer', function(data){
+            currentPlayers.push(data);
+        });
+
 
         if (cursors.left.isDown) {
+
             player.body.velocity.x = -150;
             player.scale.x = 1;
 
             player.animations.play('left');
 
 
-            updatePlayerMovement();
-
             if (player.body.touching.down) {
                 state.text = 'running';
             }
 
         } else if (cursors.right.isDown) {
-
-            updatePlayerMovement();
 
             player.body.velocity.x = 150;
             player.scale.x = -1;
