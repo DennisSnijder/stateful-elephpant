@@ -6,6 +6,7 @@ window.onload = function() {
     var bigStyle = { font: "65px Arial", fill: "#ffffff", align: "center" };
     var normalStyle = { font: "16px monospace", fill: "#ffffff", align: "center" };
 
+
     function preload() {
         game.load.image('sky', 'assets/sky.png');
         game.load.spritesheet('ground', 'assets/platform.png', 800, 64);
