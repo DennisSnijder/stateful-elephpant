@@ -7,23 +7,33 @@ var Player = function(startX, startY) {
         return x;
     };
 
-    var getY = function() {
-        return y;
-    };
-
     var setX = function(newX) {
         x = newX;
+    };
+
+    var getY = function() {
+        return y;
     };
 
     var setY = function(newY) {
         y = newY;
     };
 
+    var getBulletDirection = function() {
+        return bulletDirection;
+    };
+
+    var setBulletDirection = function(direction) {
+        bulletDirection = direction;
+    };
+
     return {
         getX: getX,
-        getY: getY,
         setX: setX,
+        getY: getY,
         setY: setY,
+        getBulletDirection: getBulletDirection,
+        setBulletDirection: setBulletDirection,
         id: id
     }
 };

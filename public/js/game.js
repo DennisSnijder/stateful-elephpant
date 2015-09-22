@@ -5,6 +5,8 @@ window.onload = function() {
     var platforms;
     var player;
     var state;
+    var bullets;
+    var watchPosition;
     var bigStyle = { font: "65px Arial", fill: "#ffffff", align: "center" };
     var normalStyle = { font: "16px monospace", fill: "#ffffff", align: "center" };
     var enemies;
@@ -43,6 +45,7 @@ window.onload = function() {
         game.load.image('sky', 'assets/sky.png');
         game.load.spritesheet('ground', 'assets/platform.png', 800, 64);
         game.load.spritesheet('elephpant', 'assets/elephpant.png', 130, 80);
+        game.load.image('bullet', '/assets/bullet.png');
     }
 
     function create() {
@@ -82,6 +85,16 @@ window.onload = function() {
 
         player.animations.add('left', [0, 1, 2, 3, 4, 5], 20, true);
         player.animations.add('right', [0, 1, 2, 3, 4, 5], 20, true);
+
+
+        bullets = game.add.group();
+        bullets.enableBody = true;
+        bullets.physicsBodyType = Phaser.Physics.ARCADE;
+        bullets.createMultiple(30, 'bullet');
+        bullets.setAll('anchor.x', 0.5);
+        bullets.setAll('anchor.y', 1);
+        bullets.setAll('outOfBoundsKill', true);
+        bullets.setAll('checkWorldBounds', true);
 
         state = game.add.text(0, 0, 'idling', bigStyle);
 
@@ -142,10 +155,8 @@ window.onload = function() {
 
     function update() {
 
-        for (var i = 0; i < enemies.length; i++)
-        {
-            if (enemies[i].alive)
-            {
+        for (var i = 0; i < enemies.length; i++){
+            if (enemies[i].alive) {
                 enemies[i].update();
                 game.physics.arcade.collide(enemies[i].player, platforms);
             }
@@ -163,6 +174,8 @@ window.onload = function() {
             if (player.body.touching.down) {
                 state.text = 'running';
             }
+            watchPosition = 0;
+
         } else if (cursors.right.isDown) {
             player.body.velocity.x = 150;
             player.scale.x = -1;
@@ -172,6 +185,7 @@ window.onload = function() {
             if (player.body.touching.down) {
                 state.text = 'running';
             }
+            watchPosition = 1;
         } else {
             player.animations.stop();
             player.frame = 2;
@@ -181,10 +195,14 @@ window.onload = function() {
             }
         }
 
-        if (game.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR) && player.body.touching.down)
-        {
+        if (cursors.up.isDown && player.body.touching.down) {
             player.body.velocity.y = -350;
             state.text = 'jumping';
+        }
+
+        if (game.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR) && player.body.touching.down) {
+            state.text = 'shooting';
+            fireBullet();
         }
 
         if (cursors.down.isDown && player.body.touching.down) {
@@ -198,6 +216,7 @@ window.onload = function() {
                 var text = game.add.text(player.body.x, player.body.y + 60, 'var_dump($this);', normalStyle);
             }
         }
+
         socket.emit("move player", {x: player.x, y:player.y});
     }
 
@@ -208,5 +227,16 @@ window.onload = function() {
                 return enemies[i];
         }
         return false;
+    }
+
+    function fireBullet() {
+        //  Grab the first bullet we can from the pool
+       var bullet = bullets.getFirstExists(false);
+
+        if (bullet) {
+            //  And fire it
+            bullet.reset(player.x, player.y + 8);
+            bullet.body.velocity.x = -400;
+        }
     }
 };
