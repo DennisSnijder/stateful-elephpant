@@ -1,6 +1,6 @@
 # The Stateful ElePHPant (Multiplayer version)
 
-This Fork is a Multiplayer version of [The Stateful ElePHPant](https://raw.githubusercontent.com/rskuipers/stateful-elephpant) by Rick Kuipers
+This Fork is a Multiplayer version of [The Stateful ElePHPant](https://github.com/rskuipers/stateful-elephpant) by Rick Kuipers
 
 ## Build
 Build with:
