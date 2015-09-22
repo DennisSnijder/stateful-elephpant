@@ -91,7 +91,7 @@ window.onload = function() {
         bullets.enableBody = true;
         bullets.physicsBodyType = Phaser.Physics.ARCADE;
         bullets.createMultiple(30, 'bullet');
-        bullets.setAll('anchor.x', 0.5);
+        bullets.setAll('anchor.x', .5);
         bullets.setAll('anchor.y', 1);
         bullets.setAll('outOfBoundsKill', true);
         bullets.setAll('checkWorldBounds', true);
@@ -236,7 +236,13 @@ window.onload = function() {
         if (bullet) {
             //  And fire it
             bullet.reset(player.x, player.y + 8);
-            bullet.body.velocity.x = -400;
+            if (watchPosition == 0) {
+                bullet.body.velocity.x =- 100;
+                console.log(bullet.rotation)
+// game.camera.displayObject.rotation = Math.PI/4;;
+            } else {
+                bullet.body.velocity.x =+ 100;
+            }
         }
     }
 };
