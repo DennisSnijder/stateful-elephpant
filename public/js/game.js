@@ -5,7 +5,7 @@ window.onload = function() {
     var state;
     var bigStyle = { font: "65px Arial", fill: "#ffffff", align: "center" };
     var normalStyle = { font: "16px monospace", fill: "#ffffff", align: "center" };
-
+    var socket = io();
 
     function preload() {
         game.load.image('sky', 'assets/sky.png');
@@ -34,23 +34,31 @@ window.onload = function() {
         ground.height = 64;
         ground.body.immovable = true;
 
-        player = game.add.sprite(32, game.world.height - 100, 'elephpant');
+        player = createPlayer();
 
-        game.physics.arcade.enable(player);
-
-        player.body.collideWorldBounds = true;
-        player.body.bounce.y = 0;
-        player.body.gravity.y = 300;
-
-        player.anchor.setTo(.5,.5);
-
-        player.animations.add('left', [0, 1, 2, 3, 4, 5], 20, true);
-        player.animations.add('right', [0, 1, 2, 3, 4, 5], 20, true);
 
         state = game.add.text(0, 0, 'idling', bigStyle);
 
         cursors = game.input.keyboard.createCursorKeys();
         game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
+    }
+
+
+    function createPlayer() {
+        var newPlayer = game.add.sprite(32, game.world.height - 100, 'elephpant');
+
+        game.physics.arcade.enable(newPlayer);
+
+        newPlayer.body.collideWorldBounds = true;
+        newPlayer.body.bounce.y = 0;
+        newPlayer.body.gravity.y = 300;
+
+        newPlayer.anchor.setTo(.5,.5);
+
+        newPlayer.animations.add('left', [0, 1, 2, 3, 4, 5], 20, true);
+        newPlayer.animations.add('right', [0, 1, 2, 3, 4, 5], 20, true);
+
+        return newPlayer;
     }
 
     function update() {
@@ -64,10 +72,17 @@ window.onload = function() {
 
             player.animations.play('left');
 
+
+            updatePlayerMovement();
+
             if (player.body.touching.down) {
                 state.text = 'running';
             }
+
         } else if (cursors.right.isDown) {
+
+            updatePlayerMovement();
+
             player.body.velocity.x = 150;
             player.scale.x = -1;
 
@@ -102,5 +117,13 @@ window.onload = function() {
                 var text = game.add.text(player.body.x, player.body.y + 60, 'var_dump($this);', normalStyle);
             }
         }
+    }
+
+
+    function updatePlayerMovement() {
+        socket.emit('updateMovement', {
+            x : player.body.x,
+            y: player.body.y
+        });
     }
 };
