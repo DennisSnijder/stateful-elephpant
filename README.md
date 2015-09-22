@@ -1,24 +1,14 @@
-# The Stateful ElePHPant
+# The Stateful ElePHPant (Multiplayer version)
 
-This project explains states using a game (with normal if statements) and a PHP implementation
-using the state pattern.
+This Fork is a Multiplayer version of [The Stateful ElePHPant](https://raw.githubusercontent.com/rskuipers/stateful-elephpant) by Rick Kuipers
 
-## Game
+## Build
+Build with:
+``npm install``
 
-You can see the game here: [https://rskuipers.github.com/stateful-elephpant](https://rskuipers.github.com/stateful-elephpant)
+## Run
+Run with:
+``node app.js``
 
-## Usage
+Then go to 127.0.0.1:1337
 
-If you want to run the game locally, start a php service in the root of this project.
-
-```sh
-$ php -S 0:8080
-```
-
-And view the game here: [http://localhost:8080/index.html](http://localhost:8080/index.html)
-
-You can also execute the PHP equivalant.
-
-```sh
-$ php index.php
-```
