@@ -40,10 +40,20 @@ window.onload = function() {
 
     RemotePlayer.prototype.update = function() {
 
+        this.player.body.velocity.x = 0;
+
         if(this.animation == 'left') {
+            this.player.body.velocity.x = -150;
+            this.player.scale.x = 1;
             this.player.animations.play('left');
         }else if(this.animation == 'right') {
+            this.player.body.velocity.x = 150;
+            this.player.scale.x = -1;
             this.player.animations.play('right');
+        }else if(this.animation == 'crouching') {
+            this.player.body.velocity.x = 0;
+            this.player.body.velocity.y = 0;
+            this.player.frame = 6;
         }else {
             this.player.animations.stop();
         }
