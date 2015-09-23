@@ -27,7 +27,6 @@ function onClientDisconnect() {
     var removePlayer = playerById(this.id);
 
     if (!removePlayer) {
-   //     util.log("Player not found: "+this.id);
         return;
     }
 
@@ -56,13 +55,14 @@ function onMovePlayer(data) {
     var movePlayer = playerById(this.id);
 
     if (!movePlayer) {
-    //    util.log("Player not found: "+this.id);
         return;
     }
 
     movePlayer.setX(data.x);
     movePlayer.setY(data.y);
-    this.broadcast.emit("move player", {id: movePlayer.id, x: movePlayer.getX(), y: movePlayer.getY()});
+    movePlayer.setAnimation(data.animation);
+
+    this.broadcast.emit("move player", {id: movePlayer.id, x: movePlayer.getX(), y: movePlayer.getY(), animation: movePlayer.getAnimation()});
 }
 
 

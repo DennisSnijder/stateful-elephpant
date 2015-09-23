@@ -2,6 +2,8 @@ var Player = function(startX, startY, name) {
     var x = startX,
         y = startY,
         playerName = name,
+        bulletDirection,
+        animation,
         id;
 
     var getX = function() {
@@ -36,6 +38,14 @@ var Player = function(startX, startY, name) {
         playerName = name;
     };
 
+    var getAnimation = function() {
+        return animation;
+    };
+
+    var setAnimation = function(newAnim) {
+        animation = newAnim;
+    };
+
     return {
         getX: getX,
         setX: setX,
@@ -45,6 +55,8 @@ var Player = function(startX, startY, name) {
         setBulletDirection: setBulletDirection,
         getName: getName,
         setName: setName,
+        getAnimation: getAnimation,
+        setAnimation: setAnimation,
         id: id
     }
 };
