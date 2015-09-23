@@ -13,10 +13,11 @@ window.onload = function() {
     var socket;
     var currentAnimation = 'idle';
 
-    RemotePlayer = function (index, game, player, startX, startY) {
+    RemotePlayer = function (index, game, player, startX, startY, name) {
         var x = startX;
         var y = startY;
         this.game = game;
+        
 
         this.id = index.toString();
         this.player = this.game.add.sprite(32, this.game.world.height - 100, 'elephpant');
@@ -33,6 +34,7 @@ window.onload = function() {
 
         this.player.animations.add('left', [0, 1, 2, 3, 4, 5], 20, true);
         this.player.animations.add('right', [0, 1, 2, 3, 4, 5], 20, true);
+        this.playerName = game.add.text(player.body.x, player.body.y, name, normalStyle);
     };
 
 
@@ -49,6 +51,7 @@ window.onload = function() {
         //todo add animations here
         this.lastPosition.x = this.player.x;
         this.lastPosition.y = this.player.y;
+        this.playerName.x = this.player.x;
     };
 
     function preload() {
@@ -152,8 +155,8 @@ window.onload = function() {
     }
 
     function onNewPlayer(data) {
-        console.log("New player connected: "+data.id);
-        enemies.push(new RemotePlayer(data.id, game, player, data.x, data.y));
+        console.log("New player connected: "+ data.id);
+        enemies.push(new RemotePlayer(data.id, game, player, data.x, data.y, "data.name"));
     }
 
     function onMovePlayer(data) {
@@ -215,7 +218,7 @@ window.onload = function() {
             if (player.body.touching.down) {
                 state.text = 'running';
             }
-            watchPosition = 1;
+            watchPosition = 2;
         } else {
             player.animations.stop();
             player.frame = 2;
@@ -270,9 +273,9 @@ window.onload = function() {
             //  And fire it
             bullet.reset(player.x, player.y + 8);
             if (watchPosition == 0) {
-                bullet.body.velocity.x =- 100;
                 bullet.scale.x = -1;
-            } else {
+                bullet.body.velocity.x =- 100;
+            } else if (watchPosition == 2) {
                 bullet.scale.x = 1;
                 bullet.body.velocity.x =+ 100;
             }
