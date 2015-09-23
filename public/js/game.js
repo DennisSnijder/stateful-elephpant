@@ -1,5 +1,5 @@
 window.onload = function() {
-    var game = new Phaser.Game(800, 600, Phaser.AUTO, '', { preload: preload, create: create, update: update });
+    var game = new Phaser.Game(document.innerWidth, document.innerHeight, Phaser.AUTO, '', { preload: preload, create: create, update: update });
     game.disableVisibilityChange = true;
 
     var platforms;
@@ -41,9 +41,9 @@ window.onload = function() {
         if(this.animation == 'left') {
             this.player.animations.play('left');
         }else if(this.animation == 'right') {
-            this.animations.play('right');
+            this.player.animations.play('right');
         }else {
-            this.animations.stop();
+            this.player.animations.stop();
         }
 
         //todo add animations here
@@ -109,9 +109,24 @@ window.onload = function() {
 
         state = game.add.text(0, 0, 'idling', bigStyle);
 
+
         cursors = game.input.keyboard.createCursorKeys();
         game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
         setEventHandlers();
+
+        game.scale.fullScreenScaleMode = Phaser.ScaleManager.EXACT_FIT;
+        game.input.onDown.add(goFull, this);
+    }
+
+    function goFull() {
+        if (game.scale.isFullScreen)
+        {
+            game.scale.stopFullScreen();
+        }
+        else
+        {
+            game.scale.startFullScreen(false);
+        }
     }
 
     var setEventHandlers = function() {
@@ -230,6 +245,7 @@ window.onload = function() {
 
             if (game.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR)) {
                 var text = game.add.text(player.body.x, player.body.y + 60, 'var_dump($this);', normalStyle);
+                game.scale.startFullScreen(false);
             }
         }
 
