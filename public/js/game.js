@@ -11,7 +11,6 @@ window.onload = function() {
     var normalStyle = { font: "16px monospace", fill: "#ffffff", align: "center" };
     var enemies;
     var socket;
-    var currentAnimation = 'idle';
 
     RemotePlayer = function (index, game, player, startX, startY, name) {
         var x = startX;
@@ -54,8 +53,9 @@ window.onload = function() {
             this.player.body.velocity.x = 0;
             this.player.body.velocity.y = 0;
             this.player.frame = 6;
-        }else {
+        }else if(this.animation == 'idle'){
             this.player.animations.stop();
+            this.player.frame = 2;
         }
 
         //todo add animations here
@@ -195,6 +195,8 @@ window.onload = function() {
 
     function update() {
 
+        var currentAnimation = 'idle';
+
         for (var i = 0; i < enemies.length; i++){
             if (enemies[i].alive) {
                 enemies[i].update();
@@ -222,7 +224,6 @@ window.onload = function() {
             player.scale.x = -1;
 
             player.animations.play('right');
-
             currentAnimation = 'right';
 
             if (player.body.touching.down) {
@@ -235,6 +236,7 @@ window.onload = function() {
 
             if (player.body.touching.down) {
                 state.text = 'idling';
+                currentAnimation = 'idle';
             }
         }
 
