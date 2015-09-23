@@ -11,6 +11,7 @@ window.onload = function() {
     var normalStyle = { font: "16px monospace", fill: "#ffffff", align: "center" };
     var enemies;
     var socket;
+    var currentAnimation = 'idle';
 
     RemotePlayer = function (index, game, player, startX, startY) {
         var x = startX;
@@ -26,6 +27,7 @@ window.onload = function() {
         this.player.body.collideWorldBounds = true;
         this.player.body.bounce.y = 0;
         this.player.body.gravity.y = 300;
+        this.animation = 0;
 
         this.player.anchor.setTo(.5,.5);
 
@@ -35,6 +37,15 @@ window.onload = function() {
 
 
     RemotePlayer.prototype.update = function() {
+
+        if(this.animation == 'left') {
+            this.player.animations.play('left');
+        }else if(this.animation == 'right') {
+            this.animations.play('right');
+        }else {
+            this.animations.stop();
+        }
+
         //todo add animations here
         this.lastPosition.x = this.player.x;
         this.lastPosition.y = this.player.y;
@@ -139,6 +150,7 @@ window.onload = function() {
         }
         movePlayer.player.x = data.x;
         movePlayer.player.y = data.y;
+        movePlayer.animation = data.animation;
     }
 
 
@@ -170,6 +182,7 @@ window.onload = function() {
             player.scale.x = 1;
 
             player.animations.play('left');
+            currentAnimation = 'left';
 
             if (player.body.touching.down) {
                 state.text = 'running';
@@ -181,6 +194,8 @@ window.onload = function() {
             player.scale.x = -1;
 
             player.animations.play('right');
+
+            currentAnimation = 'right';
 
             if (player.body.touching.down) {
                 state.text = 'running';
@@ -211,13 +226,14 @@ window.onload = function() {
             player.frame = 6;
 
             state.text = 'crouching';
+            currentAnimation = 'crouching';
 
             if (game.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR)) {
                 var text = game.add.text(player.body.x, player.body.y + 60, 'var_dump($this);', normalStyle);
             }
         }
 
-        socket.emit("move player", {x: player.x, y:player.y});
+        socket.emit("move player", {x: player.x, y:player.y, animation: currentAnimation});
     }
 
     function playerById(id) {
@@ -234,13 +250,14 @@ window.onload = function() {
        var bullet = bullets.getFirstExists(false);
 
         if (bullet) {
+            bullet.anchor.setTo(.5,.5);
             //  And fire it
             bullet.reset(player.x, player.y + 8);
             if (watchPosition == 0) {
                 bullet.body.velocity.x =- 100;
-                console.log(bullet.rotation)
-// game.camera.displayObject.rotation = Math.PI/4;;
+                bullet.scale.x = -1;
             } else {
+                bullet.scale.x = 1;
                 bullet.body.velocity.x =+ 100;
             }
         }
