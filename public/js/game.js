@@ -11,6 +11,7 @@ window.onload = function() {
     var normalStyle = { font: "16px monospace", fill: "#ffffff", align: "center" };
     var enemies;
     var socket;
+    var name;
 
     RemotePlayer = function (index, game, player, startX, startY, name) {
         var x = startX;
@@ -73,8 +74,9 @@ window.onload = function() {
     }
 
     function create() {
-        socket = io.connect();
+        name = prompt('Your ingame name');
 
+        socket = io.connect();
         game.stage.smoothed = true;
 
         game.physics.startSystem(Phaser.Physics.ARCADE);
@@ -83,7 +85,7 @@ window.onload = function() {
         game.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
         game.scale.pageAlignHorizontally = true;
 
-        var sky = game.add.sprite(0, 0, 'sky');
+        var sky = game.add.sprite(0, 0,     'sky');
         sky.fixedToCamera = true;
 
         platforms = game.add.group();
@@ -122,9 +124,9 @@ window.onload = function() {
 
         state = game.add.text(0, 0, 'idling', bigStyle);
 
-
         cursors = game.input.keyboard.createCursorKeys();
         game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
+
         setEventHandlers();
 
         game.scale.fullScreenScaleMode = Phaser.ScaleManager.EXACT_FIT;
@@ -157,7 +159,7 @@ window.onload = function() {
 
     function onSocketConnected() {
         console.log("Connected to socket server");
-        socket.emit("new player", {x: player.x, y:player.y});
+        socket.emit("new player", {x: player.x, y:player.y, name:name});
     }
 
     function onSocketDisconnect() {
@@ -166,7 +168,7 @@ window.onload = function() {
 
     function onNewPlayer(data) {
         console.log("New player connected: "+ data.id);
-        enemies.push(new RemotePlayer(data.id, game, player, data.x, data.y, "data.name"));
+        enemies.push(new RemotePlayer(data.id, game, player, data.x, data.y, data.name));
     }
 
     function onMovePlayer(data) {
@@ -294,3 +296,5 @@ window.onload = function() {
         }
     }
 };
+
+

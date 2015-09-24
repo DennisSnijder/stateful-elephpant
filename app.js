@@ -27,6 +27,7 @@ function onClientDisconnect() {
     var removePlayer = playerById(this.id);
 
     if (!removePlayer) {
+        util.log('player not found'+ this.id);
         return;
     }
 
@@ -37,15 +38,17 @@ function onClientDisconnect() {
 
 
 function onNewPlayer(data) {
-    var newPlayer = new Player(data.x, data.y, "kip");
+    var newPlayer = new Player(data.x, data.y, data.name);
     newPlayer.id = this.id;
 
-    this.broadcast.emit("new player", {id: newPlayer.id, x: newPlayer.getX(), y: newPlayer.getY()});
+    this.broadcast.emit("new player", {id: newPlayer.id, x: newPlayer.getX(),
+        y: newPlayer.getY(), name: newPlayer.getName()});
 
     var i, existingPlayer;
     for (i = 0; i < players.length; i++) {
         existingPlayer = players[i];
-        this.emit("new player", {id: existingPlayer.id, x: existingPlayer.getX(), y: existingPlayer.getY()});
+        this.emit("new player", {id: existingPlayer.id, x: existingPlayer.getX(),
+            y: existingPlayer.getY(), name: newPlayer.getName()});
     }
 
     players.push(newPlayer);
@@ -55,6 +58,7 @@ function onMovePlayer(data) {
     var movePlayer = playerById(this.id);
 
     if (!movePlayer) {
+        util.log('player not found'+ this.id);
         return;
     }
 
